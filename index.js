@@ -4,6 +4,29 @@ const express = require('express');
 const mongoose = require('mongoose');
 const mongoString = process.env.DATABASE_URL;
 jsonwebtoken = require("jsonwebtoken");
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUI = require("swagger-ui-express");
+const options = {
+	definition: {
+		openapi: "3.0.0",
+		info: {
+			title: "Library API",
+			version: "1.0.0",
+			description: "A simple Express Library API",
+		},
+		servers: [
+			{
+				url: "http://localhost:3000",
+			},
+		],
+	},
+	apis: ["./routes/*.js"],
+};
+
+
+const specs = swaggerJsDoc(options);
+const app = express();
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
 mongoose.connect(mongoString);
 const database = mongoose.connection;
@@ -15,7 +38,7 @@ database.on('error', (error) => {
 database.once('connected', () => {
     console.log('Database Connected');
 })
-const app = express();
+// const app = express();
 app.use(cors())
 app.use(express.json());
 
@@ -34,14 +57,9 @@ app.use(function(req, res, next) {
   }
 });
 
-app.use('/api', routes)
+app.use('/api',routes)
 
 app.listen(3000, () => {
     console.log(`Server Started at ${3000}`)
 })
 
-const fs = require('fs');
-let adminData = fs.readFileSync('admin-account.json');  
-let data = JSON.parse(adminData);  
-user.insertMany(data)  
-console.log(data); 

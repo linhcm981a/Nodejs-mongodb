@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "migrate:up": "migrate-mongo up"
   },
   "author": "",
   "license": "ISC",
@@ -15,7 +16,11 @@
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
+    "migrate-mongo": "^9.0.0",
+    "mongo-migrate": "^2.0.2",
     "mongoose": "^6.2.2",
-    "nodemon": "^2.0.19"
+    "nodemon": "^2.0.19",
+    "swagger-jsdoc": "^6.2.5",
+    "swagger-ui-express": "^4.5.0"
   }
 }
