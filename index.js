@@ -1,65 +1,28 @@
-require('dotenv').config();
-const cors = require('cors');
-const express = require('express');
-const mongoose = require('mongoose');
-const mongoString = process.env.DATABASE_URL;
-jsonwebtoken = require("jsonwebtoken");
-const swaggerJsDoc = require("swagger-jsdoc");
-const swaggerUI = require("swagger-ui-express");
-const options = {
-	definition: {
-		openapi: "3.0.0",
-		info: {
-			title: "Library API",
-			version: "1.0.0",
-			description: "A simple Express Library API",
-		},
-		servers: [
-			{
-				url: "http://localhost:3000",
-			},
-		],
-	},
-	apis: ["./routes/*.js"],
-};
-
-
-const specs = swaggerJsDoc(options);
+const express = require("express");
+const cors = require("cors")
 const app = express();
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
+const mongoose = require("mongoose");
+var bodyParser = require("body-parser");
+const morgan = require("morgan");
+const dotenv = require("dotenv");
+const authorRoute = require("./src/routes/author")
+const bookRook = require("./src/routes/book")
 
-mongoose.connect(mongoString);
-const database = mongoose.connection;
-
-database.on('error', (error) => {
-    console.log(error)
+dotenv.config();
+///CONNECT DATABASE
+mongoose.connect((process.env.MONGODB_URL), () => {
+    console.log("Connect to MongoDb")
 })
 
-database.once('connected', () => {
-    console.log('Database Connected');
-})
-// const app = express();
-app.use(cors())
 app.use(express.json());
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(cors());
+app.use(morgan("common"));
 
-const routes = require('./routes/routes');
+///ROUTES
+app.use("/v1/author", authorRoute)
+app.use("/v1/book", bookRook)
 
-app.use(function(req, res, next) {
-  if (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'JWT') {
-    jsonwebtoken.verify(req.headers.authorization.split(' ')[1], 'RESTFULAPIs', function(err, decode) {
-      if (err) req.user = undefined;
-      req.user = decode;
-      next();
-    });
-  } else {
-    req.user = undefined;
-    next();
-  }
-});
-
-app.use('/api',routes)
-
-app.listen(3000, () => {
-    console.log(`Server Started at ${3000}`)
+app.listen(8000, () => {
+    console.log("Server is running...")
 })
-
